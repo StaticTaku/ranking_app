@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>YouTube IFrame API Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .btn-lg {
+            font-size: 2em;
+        }
+    </style>
+  </head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+        
+    
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
+                    <div id="player1" class="col-12"></div>
+                    <button onclick="listen1()" class="btn btn-primary col-12 mt-3 py-4 btn-lg" type="button">こっちを聴く</button>
+                    <button onclick="poll1()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
+                </div>
+                <div class="col-sm-12 col-md-12 col-xs-12 col-lg-2 d-flex align-items-center"> <img src="{% static 'admin/img/vs.jpg' %}" width="300" height="300" class="img-fluid mx-auto d-block" alt="Responsive image"> </div>
+                <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
+                    <div id="player2" class="col-12"></div>
+                    <button onclick="listen2()" class="btn btn-primary col-12 mt-3 mb py-4 btn-lg" type="button">こっちを聴く</button>
+                    <button onclick="poll2()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
+                </div>
+            </div>
+        </div>
+    
+    <script>
+      // 2. This code loads the IFrame Player API code asynchronously.
+      //以下ではscriptタグを生成・Youtube用のscriptファイルを読み込める様に編集、html上に設置ということをしています。
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //これは②で作ったscriptタグの読み込みが終わったら自動で動くコードで、埋め込み用の動画を生成してくれます。
+      //この時、どの動画をどんな画質で〜、、、という設定を書きます。そしてこの設定の通り後ほど埋め込み動画が生成されます。
+      //で、これよく見ると新しく作ったオブジェクトが「player」という変数に入ってます。
+      //    after the API code downloads.
+      var player1;
+      var player2;
+
+      videoId1 = 'rKDNU6TQ3PU';
+      videoId2 = '4DxL6IKmXx4';
+      function onYouTubeIframeAPIReady() {
+        player1 = new YT.Player('player1', {
+          height: '500',
+          width: '640',
+          videoId: videoId1,
+          playerVars: {
+            'autoplay': 1, // 自動再生しない
+            'controls': 1, // コントロールバーを表示する
+            'disablekb': 0, // キーボード操作を有効にする
+            'rel': 0, // 関連動画を表示しない
+            'showinfo': 0 // 動画情報を表示しない
+          },
+          events: {
+            'onReady': onPlayerReady,
+          }
+        });
+        player2 = new YT.Player('player2', {
+          height: '500',
+          width: '640',
+          videoId: videoId2,
+          playerVars: {
+            'autoplay': 1, // 自動再生しない,
+            'controls': 1, // コントロールバーを表示する
+            'disablekb': 0, // キーボード操作を有効にする
+            'rel': 0, // 関連動画を表示しない
+            'showinfo': 0 // 動画情報を表示しない
+          },
+          events: {
+            'onReady': onPlayerReady,
+          }
+        });
+      }
+
+      function poll1() {
+        console.log("1に投票");
+      }
+
+      function poll2() {
+        console.log("2に投票");
+      }
+
+      function onPlayerReady(event) {
+        event.target.mute();
+        event.target.seekTo(event.target.getDuration()*0.3, true);
+        event.target.playVideo();
+      }
+      
+      function register() {
+        const video1 = document.getElementById('window1');
+	    const video2 = document.getElementById('window2');
+        video1.addEventListener('mouseleave', function(event){
+                player1.mute();
+                player1.playVideo();
+            });
+        //アンミュート
+        video1.addEventListener('mouseenter', function(event){
+            player1.unMute();
+            player1.playVideo();
+        });
+
+        video2.addEventListener('mouseleave', function(event){
+                player2.mute();
+                player2.playVideo();
+            });
+        //アンミュート
+        video2.addEventListener('mouseenter', function(event){
+            player2.unMute();
+            player2.playVideo();
+        });
+      }
+
+      function listen1() {
+        player1.unMute();
+        player2.mute();
+        player1.playVideo();
+      }
+
+      function listen2() {
+        player1.mute();
+        player2.unMute();
+        player2.playVideo();
+      }
+        
+    </script>
+  </body>
+</html>

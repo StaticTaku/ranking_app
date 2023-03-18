@@ -26,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['tk2-263-41343.vs.sakura.ne.jp']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,6 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'ranking.apps.RankingConfig' ,
 ]
 
 MIDDLEWARE = [
@@ -106,9 +107,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
