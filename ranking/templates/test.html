@@ -1,0 +1,387 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>YouTube IFrame API Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .btn-lg {
+            font-size: 2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+  </head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="mainNav">
+      <div class="container px-4">
+          <a class="navbar-brand text-monospace" href="{% url 'ranking:index' %}">色々トーナメント</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+              <ul class="navbar-nav ms-auto">
+                  <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+              </ul>
+          </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <h1 class="text-uppercase display-4" style="font-family: 'Roboto', sans-serif;" id="title">2022年ヒットソング</h1>
+          <p class="lead display-6" style="font-family: 'Roboto', sans-serif;" id="progress">ベスト4 - 1/4 試合目</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
+                <div id="player1" class="col-12"></div>
+                <button onclick="listen1()" class="btn btn-primary col-12 mt-3 py-4 btn-lg" type="button">こっちを聴く</button>
+                <button onclick="poll1()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
+            </div>
+            <div class="col-sm-12 col-md-12 col-xs-12 col-lg-2 d-flex align-items-center"> <img src="{% static 'admin/img/vs.jpg' %}" width="300" height="300" class="img-fluid mx-auto d-block" alt="Responsive image"> </div>
+            <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
+                <div id="player2" class="col-12"></div>
+                <button onclick="listen2()" class="btn btn-primary col-12 mt-3 mb py-4 btn-lg" type="button">こっちを聴く</button>
+                <button onclick="poll2()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
+            </div>
+        </div>
+    </div>    
+
+    {% csrf_token %}
+    <script>
+      // ビューから渡されたPythonのリストをJavaScript変数に割り当てる
+      var link_list = {{ link_list|safe }};
+      var tournament_name = "{{tournament_name}}";
+      var title_element = document.getElementById("title");
+      title_element.innerHTML = tournament_name;
+      var progress_element = document.getElementById("progress");
+      // 2. This code loads the IFrame Player API code asynchronously.
+      //以下ではscriptタグを生成・Youtube用のscriptファイルを読み込める様に編集、html上に設置ということをしています。
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //これは②で作ったscriptタグの読み込みが終わったら自動で動くコードで、埋め込み用の動画を生成してくれます。
+      //この時、どの動画をどんな画質で〜、、、という設定を書きます。そしてこの設定の通り後ほど埋め込み動画が生成されます。
+      //で、これよく見ると新しく作ったオブジェクトが「player」という変数に入ってます。
+      //    after the API code downloads.
+
+      function shuffle(array) {
+        for (let i = array.length - 1; i >= 0; i--) {
+          let rand = Math.floor(Math.random() * (i + 1));
+          // 配列の数値を入れ替える
+          [array[i], array[rand]] = [array[rand], array[i]]
+        }
+        return array;
+      }
+
+      var player1;
+      var player2;
+      class video_info {
+      constructor(video_id, losed_by) {
+          this.video_id = video_id;
+          this.losed_by = losed_by;
+        }
+      }
+
+      id_list = [];
+
+      for (i=0; i < link_list.length; i++) {
+        id_list.push(i);
+      }
+      shuffle(id_list);
+      team_num = link_list.length;
+      power_2 = 1;
+      power_2_count = 0;
+
+      while(power_2 < team_num){
+        power_2 *= 2;
+        power_2_count++;
+      }
+      result_list = [[]];
+      for(let i = 0;i<power_2_count;++i){
+        result_list.push([]);
+      }
+      
+      var sheed_num = power_2 - team_num;
+      left_id = 0;
+      right_id = 1;
+      tree_pos  = power_2_count;
+
+      videoId1 = link_list[id_list[left_id]];
+      videoId2 = link_list[id_list[right_id]];
+
+      best_num = 2**tree_pos-sheed_num;
+      match_num_at_best = 2**tree_pos/2 - sheed_num;
+      present_match_num = 1;
+
+      progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
+
+      function onYouTubeIframeAPIReady() {
+        player1 = new YT.Player('player1', {
+          height: '500',
+          width: '640',
+          videoId: videoId1,
+          playerVars: {
+            'autoplay': 1, // 自動再生しない
+            'controls': 1, // コントロールバーを表示する
+            'disablekb': 0, // キーボード操作を有効にする
+            'rel': 0, // 関連動画を表示しない
+            'showinfo': 0 // 動画情報を表示しない
+          },
+          events: {
+            'onReady': onPlayerReady,
+          }
+        });
+        player2 = new YT.Player('player2', {
+          height: '500',
+          width: '640',
+          videoId: videoId2,
+          playerVars: {
+            'autoplay': 1, // 自動再生しない,
+            'controls': 1, // コントロールバーを表示する
+            'disablekb': 0, // キーボード操作を有効にする
+            'rel': 0, // 関連動画を表示しない
+            'showinfo': 0 // 動画情報を表示しない
+          },
+          events: {
+            'onReady': onPlayerReady,
+          }
+        });
+      }
+
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+
+      const csrftoken = getCookie('csrftoken');
+      $.ajaxSetup({
+          headers: {
+              'X-CSRFToken': csrftoken
+          }
+      });
+
+      var tournament_pk = {{ tournament_pk|safe }};
+
+      function poll1() {
+        console.log(link_list[id_list[left_id]]);
+        console.log(link_list[id_list[right_id]]);
+        result_list[tree_pos].push(new video_info(id_list[right_id],id_list[left_id]));
+        id_list.splice(right_id,1);
+        left_id++;
+        right_id++;
+        if(id_list.length == 1)
+        {
+          tree_pos--;
+          result_list[tree_pos].push(new video_info(id_list[0],'none'));
+          window.location.href = "/preview/movies/"+ tournament_pk + "/" + id_list[0];
+          return;
+        }
+
+        if(present_match_num == match_num_at_best)
+        {
+          tree_pos--;
+          present_match_num = 1;
+          best_num = 2**tree_pos;
+          match_num_at_best = best_num/2;
+          left_id = 0;
+          right_id = 1;
+        }else{
+          present_match_num++;
+        }
+
+        if(best_num == 2)
+        {
+          progress_element.innerHTML = "決勝戦";
+        }else{
+          progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
+        }
+
+
+        player1.mute();
+        player2.mute();
+        var count = 1;
+
+        videoId1 = link_list[id_list[left_id]];
+        videoId2 = link_list[id_list[right_id]];
+
+        player1.loadVideoById(videoId1);
+        player2.loadVideoById(videoId2);
+        // setIntervalを使用して、0.5秒ごとに処理を実行する
+        const intervalId = setInterval(() => {
+            if(player1.getDuration()>1 && player2.getDuration()>1) {
+              player1.seekTo(player1.getDuration()*0.3, true);
+              player2.seekTo(player2.getDuration()*0.3, true);
+              player1.mute();
+              player2.mute();
+              clearInterval(intervalId); // setIntervalを停止する
+            }
+
+          if (count >= 6) { // カウンター変数が6になったら、3秒間の処理が完了したことを示す
+            clearInterval(intervalId); // setIntervalを停止する
+          }
+        }, 500); // 0.5秒ごとに処理を実行するように指定する
+        
+        /*
+        var list1 = [1,2,3,4,5];
+        $.ajax({
+          type: 'POST',
+          url: '/sendData/',
+          data: { 
+            'mylist' : JSON.stringify(list1),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+          },
+          success: function(response) {
+            console.log('成功しました');
+          },
+          error: function(response) {
+            console.log('エラーが発生しました');
+          }
+        });
+      */
+
+      }
+
+      function poll2() {
+        result_list[tree_pos].push(new video_info(id_list[left_id],id_list[right_id]));
+        id_list.splice(left_id,1);
+        left_id++;
+        right_id++;
+        if(id_list.length == 1)
+        {
+          tree_pos--;
+          result_list[tree_pos].push(new video_info(id_list[0],'none'));
+          window.location.href = "/preview/movies/"+ tournament_pk + "/" + id_list[0];
+          return;
+        }
+
+        if(present_match_num == match_num_at_best)
+        {
+          tree_pos--;
+          present_match_num = 1;
+          best_num = 2**tree_pos;
+          match_num_at_best = best_num/2;
+          left_id = 0;
+          right_id = 1;
+        }else{
+          present_match_num++;
+
+        }
+        if(best_num == 2)
+        {
+          progress_element.innerHTML = "決勝戦";
+        }else{
+          progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
+        }
+        videoId1 = link_list[id_list[left_id]];
+        videoId2 = link_list[id_list[right_id]];
+
+        player1.mute();
+        player2.mute();
+        var count = 1;
+        player1.loadVideoById(videoId1);
+        player2.loadVideoById(videoId2);
+        // setIntervalを使用して、0.5秒ごとに処理を実行する
+        const intervalId = setInterval(() => {
+            if(player1.getDuration()>1 && player2.getDuration()>1) {
+              player1.seekTo(player1.getDuration()*0.3, true);
+              player2.seekTo(player2.getDuration()*0.3, true);
+              player1.mute();
+              player2.mute();
+              clearInterval(intervalId); // setIntervalを停止する
+            }
+
+          if (count >= 6) { // カウンター変数が6になったら、3秒間の処理が完了したことを示す
+            clearInterval(intervalId); // setIntervalを停止する
+          }
+        }, 500); // 0.5秒ごとに処理を実行するように指定する
+
+        /*
+        var list1 = [1,2,3,4,5];
+        $.ajax({
+          type: 'POST',
+          url: '/sendData/',
+          data: { 
+            'mylist' : JSON.stringify(list1),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+          },
+          success: function(response) {
+            console.log('成功しました');
+          },
+          error: function(response) {
+            console.log('エラーが発生しました');
+          }
+        });
+        */
+      }
+
+      function onPlayerReady(event) {
+        event.target.mute();
+        event.target.seekTo(event.target.getDuration()*0.3, true);
+        event.target.playVideo();
+      }
+      
+      function register() {
+        const video1 = document.getElementById('window1');
+	      const video2 = document.getElementById('window2');
+        video1.addEventListener('mouseleave', function(event){
+                player1.mute();
+                player1.playVideo();
+            });
+        //アンミュート
+        video1.addEventListener('mouseenter', function(event){
+            player1.unMute();
+            player1.playVideo();
+        });
+
+        video2.addEventListener('mouseleave', function(event){
+                player2.mute();
+                player2.playVideo();
+            });
+        //アンミュート
+        video2.addEventListener('mouseenter', function(event){
+            player2.unMute();
+            player2.playVideo();
+        });
+      }
+
+      function listen1() {
+        player1.unMute();
+        player2.mute();
+        player1.playVideo();
+      }
+
+      function listen2() {
+        player1.mute();
+        player2.unMute();
+        player2.playVideo();
+      }
+        
+    </script>
+  </body>
+</html>

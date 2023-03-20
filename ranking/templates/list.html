@@ -1,0 +1,263 @@
+{% load static %}
+<!doctype html>
+<html lang="ja" >
+  <head>
+    <title>Album example for Bootstrap ﾂｷ Bootstrap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+  <body >
+
+  <!-- Navigation-->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="mainNav">
+    <div class="container px-4">
+        <a class="navbar-brand text-monospace" href="{% url 'ranking:index' %}">色々トーナメント</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+  </nav>
+
+<main role="main">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 id="title" class="text-uppercase display-4 mt-4" style="font-family: 'Roboto', sans-serif;"></h1>
+      </div>
+    </div>
+  </div>
+  <div class="section1 text-center">
+    <div class="button align-items-start">
+      <a href="" class="btn btn-primary col-6 mt-3 mb-3 py-4 btn-lg" type="button" id="play_button">遊ぶ</a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2 class="text-uppercase display-4 mt-1" style="font-family: 'Roboto', sans-serif;">出場者一覧</h2>
+      </div>
+    </div>
+  </div>
+  <div class="album py-3 bg-light">
+    <div class="container">
+      <div class="row", id="card_holder">
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+      <div class="col-12 text-center" id="page">
+      </div>
+    </div>
+  </div>
+    
+  </nav>
+</main>
+    <!-- モーダルを開くボタン・リンク -->
+    <div class="container d-none">
+        <div class="row mb-5">
+            <div class="col-2">
+                <button type="button" class="btn btn-primary mb-12" id="button_1" data-toggle="modal" data-target="#testModal">ボタンで開く</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ボタン・リンククリック後に表示される画面の内容 -->
+    <div class="modal fade show" id="testModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+        
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="container">
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <p class="text-uppercase display-5 mt-1" style="font-family: 'Roboto', sans-serif;">優勝者</p>
+                  </div>
+                </div>
+              </div>
+              <div id="mini_card_holder">
+                
+              </div>
+                <div class="modal-body">
+                    <label>結果をシェアする</label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-danger">Twitter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+ 
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+  <script>
+    // リンク要素を取得する
+    var play_button= document.getElementById("play_button");
+
+    // href属性を変更する
+    var tournament_pk = {{tournament_pk}};
+    var contentsNum_parPage = 6;
+        var link_list = {{ link_list|safe }};
+        var thumbnail_list = {{ thumbnail_list|safe }};
+        var title_list = {{ title_list|safe }};
+        var tournament_name = "{{tournament_name}}";
+        var max_num =  link_list.length;
+
+
+    {% if winner_id %}
+      var winner_id = {{winner_id}}-1;
+    {% else %}
+      var winner_id = -1;
+    {% endif %}
+
+    play_button.href = "/ranking/movies/" + tournament_pk;
+    function createPagination(max_num, active_num) {
+        // ul要素を作成
+        const ul = document.createElement("ul");
+        ul.classList.add("pagination");
+
+        if(active_num != 1)
+        {
+            // 前へリンクを作成
+          const prev = document.createElement("li");
+          prev.classList.add("page-item");
+          const prevLink = document.createElement("a");
+          prevLink.classList.add("page-link");
+          prevLink.href = "javascript:updatePage(" + String(active_num-1) + ")";
+          prevLink.textContent = "前へ";
+          prev.appendChild(prevLink);
+          ul.appendChild(prev);
+        }
+        var page_nation_count_until_active = 0;
+        var room_right = max_num - active_num;
+        var left_num = 5;
+        if(room_right <4)
+        {
+          left_num += 4-room_right;
+        }
+        for(let i = left_num;i>0;i--) {
+          if(active_num-i>0){
+            page_nation_count_until_active++;
+            // ページ番号1を作成
+            const page1 = document.createElement("li");
+            page1.classList.add("page-item");
+            const page1Link = document.createElement("a");
+            page1Link.classList.add("page-link");
+            page1Link.href = "javascript:updatePage(" + String(active_num-i) + ")";
+            page1Link.textContent = String(active_num-i);
+            page1.appendChild(page1Link);
+            ul.appendChild(page1);
+          }
+        }
+        
+        // ページ番号1を作成
+        const page1 = document.createElement("li");
+        page1.classList.add("page-item");
+        const page1Link = document.createElement("a");
+        page1Link.classList.add("page-link");
+        page1Link.classList.add("text-secondary");
+        page1Link.href = "javascript:updatePage(" + String(active_num) + ")";
+        page1Link.textContent = String(active_num);
+        page1.appendChild(page1Link);
+        ul.appendChild(page1);
+        page_nation_count_until_active++;
+
+        for(let i = 1;i<=10-page_nation_count_until_active;i++) {
+          if(active_num+i<=max_num){
+            // ページ番号1を作成
+            const page1 = document.createElement("li");
+            page1.classList.add("page-item");
+            const page1Link = document.createElement("a");
+            page1Link.classList.add("page-link");
+            page1Link.href = "javascript:updatePage(" + String(active_num+i) + ")";
+            page1Link.textContent = String(active_num+i);
+            page1.appendChild(page1Link);
+            ul.appendChild(page1);
+          }
+        }  
+      
+        if(active_num != max_num)
+        {  // 次へリンクを作成
+          const next = document.createElement("li");
+          next.classList.add("page-item");
+          const nextLink = document.createElement("a");
+          nextLink.classList.add("page-link");
+          nextLink.href = "javascript:updatePage(" + String(active_num+1) + ")";
+          nextLink.textContent = "次へ";
+          next.appendChild(nextLink);
+          ul.appendChild(next);
+        }
+
+        // ul要素を返す
+        return ul;
+    }
+    updatePage(1);
+    function updatePage(active_num)
+    {
+        if(Math.floor(max_num/6+1) != 1)
+        {
+          document.getElementById('page').innerHTML = '';
+          console.log(max_num);
+          document.getElementById('page').appendChild(createPagination(Math.floor(max_num/6+1), active_num));
+        }
+
+        document.getElementById('card_holder').innerHTML = '';
+        const cardContainer = document.getElementById('card_holder');
+        var max = Math.min(contentsNum_parPage*active_num,max_num);
+        for (let i = contentsNum_parPage*(active_num-1); i < max; ++i) {
+            cardContainer.innerHTML += createminiCard(title_list[i], link_list[i], thumbnail_list[i]);
+        }
+
+    };
+    
+        var title_element = document.getElementById("title");
+        title_element.innerHTML = tournament_name;
+
+        function createminiCard(text, buttonUrl, imageUrl, size=4) {
+          var url_youtube = "https://www.youtube.com/watch?v=" + buttonUrl;
+          imageUrl = "http://img.youtube.com/vi/" + buttonUrl + "/sddefault.jpg"
+          return `
+          <div class="col-md-${size}">
+            <div class="card mb-4 shadow-sm">
+              <img class="card-img-top" src="${imageUrl}" alt="Card image cap">
+              <div class="card-body">
+                <p class="card-text">${text}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="btn-group">
+                    <button onclick="window.open('${url_youtube}')" class="btn btn-sm btn-outline-secondary" type="button">Youtubeで見る</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          `;
+        }
+
+        if(winner_id >-1)
+        { console.log(history);
+          var currentUrl = window.location.href;
+          var index = currentUrl.lastIndexOf("/");
+          var newUrl = currentUrl.substring(0, index+1);
+          window.history.replaceState({}, document.title, newUrl);
+          if(winner_id <= link_list.length-1)
+          {
+              console.log(winner_id);
+              document.getElementById("mini_card_holder").innerHTML = createminiCard(title_list[winner_id], link_list[winner_id], thumbnail_list[winner_id], 12);
+              document.getElementById("button_1").click();
+
+          }
+        }
+  </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  </body>
+</html>
