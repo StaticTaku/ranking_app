@@ -20,9 +20,6 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     </ul>
                 </div>
             </div>
@@ -38,6 +35,7 @@
                         カテゴリーを選ぶ
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                      <li><a class="dropdown-item" onclick="changeCondition('全部')">全部</a></li>
                       <li><a class="dropdown-item" onclick="changeCondition('ミュージック')">ミュージック</a></li>
                       <li><a class="dropdown-item" onclick="changeCondition('漫画')">漫画</a></li>
                       <li><a class="dropdown-item" onclick="changeCondition('バラエティ')">バラエティ</a></li>
@@ -58,7 +56,7 @@
             </div>
         </div>
         <!-- Footer-->
-        <footer class="py-5 bg-dark">
+        <footer class="py-5 bg-dark mt-5">
             <div class="container px-4"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2022</p></div>
         </footer>
         <!-- Bootstrap core JS-->
@@ -66,165 +64,159 @@
         <!-- Core theme JS
         <script src="{% static 'js/scripts.js' %}"></script>
     -->
+    
         {% csrf_token %}
         <script>
-            var max_num = 2;
-            updatePage(1);
-            
-            function updatePage(active_num)
+            var max_num = 0;
+            var card_num_par_page = 6;
+            var category_state = "all";
+            function updatePage(active_num, card_num_par_page)
             {
                 document.getElementById('page').innerHTML = '';
-                if(Math.floor(max_num/6+1) == 1)
+                if(Math.floor(max_num/card_num_par_page+1) == 1)
                 {
                     return;
                 }
-                document.getElementById('page').appendChild(createPagination(Math.floor(max_num/6+1), active_num));
+                document.getElementById('page').appendChild(createPagination(Math.floor(max_num/card_num_par_page+1), active_num));
             };
 
-            function createPagination(max_num, active_num) {
-        // ul要素を作成
-        const ul = document.createElement("ul");
-        ul.classList.add("pagination");
+            function createPagination(max_num, active_num) 
+            {
+                // ul要素を作成
+                const ul = document.createElement("ul");
+                ul.classList.add("pagination");
+                if(active_num != 1)
+                {
+                    // 前へリンクを作成
+                    const prev = document.createElement("li");
+                    prev.classList.add("page-item");
+                    const prevLink = document.createElement("a");
+                    prevLink.classList.add("page-link");
+                    prevLink.href = "javascript:myfunc(\"" + category_state + "\"," + String(active_num-1) + "," + String(card_num_par_page) + ")";
+                    prevLink.textContent = "前へ";
+                    prev.appendChild(prevLink);
+                    ul.appendChild(prev);
+                }
+                var page_nation_count_until_active = 0;
+                var room_right = max_num - active_num;
+                var left_num = 5;
+                if(room_right <4)
+                {
+                    left_num += 4-room_right;
+                }
+                for(let i = left_num;i>0;i--) 
+                {
+                    if(active_num-i>0)
+                    {
+                        page_nation_count_until_active++;
+                        // ページ番号1を作成
+                        const page1 = document.createElement("li");
+                        page1.classList.add("page-item");
+                        const page1Link = document.createElement("a");
+                        page1Link.classList.add("page-link");
+                        page1Link.href = "javascript:myfunc(\"" + category_state + "\"," + String(active_num-i) + "," + String(card_num_par_page) + ")";
+                        page1Link.textContent = String(active_num-i);
+                        page1.appendChild(page1Link);
+                        ul.appendChild(page1);
+                    }
+                }
+                
+                // ページ番号1を作成
+                const page1 = document.createElement("li");
+                page1.classList.add("page-item");
+                const page1Link = document.createElement("a");
+                page1Link.classList.add("page-link");
+                page1Link.classList.add("text-secondary");
+                page1Link.href = "javascript:myfunc(\"" + category_state + "\"," + String(active_num) + "," + String(card_num_par_page) + ")";
+                page1Link.textContent = String(active_num);
+                page1.appendChild(page1Link);
+                ul.appendChild(page1);
+                page_nation_count_until_active++;
 
-        if(active_num != 1)
-        {
-            // 前へリンクを作成
-          const prev = document.createElement("li");
-          prev.classList.add("page-item");
-          const prevLink = document.createElement("a");
-          prevLink.classList.add("page-link");
-          prevLink.href = "javascript:updatePage(" + String(active_num-1) + ")";
-          prevLink.textContent = "前へ";
-          prev.appendChild(prevLink);
-          ul.appendChild(prev);
-        }
-        var page_nation_count_until_active = 0;
-        var room_right = max_num - active_num;
-        var left_num = 5;
-        if(room_right <4)
-        {
-          left_num += 4-room_right;
-        }
-        for(let i = left_num;i>0;i--) {
-          if(active_num-i>0){
-            page_nation_count_until_active++;
-            // ページ番号1を作成
-            const page1 = document.createElement("li");
-            page1.classList.add("page-item");
-            const page1Link = document.createElement("a");
-            page1Link.classList.add("page-link");
-            page1Link.href = "javascript:updatePage(" + String(active_num-i) + ")";
-            page1Link.textContent = String(active_num-i);
-            page1.appendChild(page1Link);
-            ul.appendChild(page1);
-          }
-        }
-        
-        // ページ番号1を作成
-        const page1 = document.createElement("li");
-        page1.classList.add("page-item");
-        const page1Link = document.createElement("a");
-        page1Link.classList.add("page-link");
-        page1Link.classList.add("text-secondary");
-        page1Link.href = "javascript:updatePage(" + String(active_num) + ")";
-        page1Link.textContent = String(active_num);
-        page1.appendChild(page1Link);
-        ul.appendChild(page1);
-        page_nation_count_until_active++;
+                for(let i = 1;i<=10-page_nation_count_until_active;i++) {
+                if(active_num+i<=max_num)
+                {
+                    // ページ番号1を作成
+                    const page1 = document.createElement("li");
+                    page1.classList.add("page-item");
+                    const page1Link = document.createElement("a");
+                    page1Link.classList.add("page-link");
+                    page1Link.href = "javascript:myfunc(\"" + category_state + "\"," + String(active_num+i) + "," + String(card_num_par_page) + ")";
+                    page1Link.textContent = String(active_num+i);
+                    page1.appendChild(page1Link);
+                    ul.appendChild(page1);
+                }
+                }  
+            
+                if(active_num != max_num)
+                {  // 次へリンクを作成
+                    const next = document.createElement("li");
+                    next.classList.add("page-item");
+                    const nextLink = document.createElement("a");
+                    nextLink.classList.add("page-link");
+                    nextLink.href = "javascript:myfunc(\"" + category_state + "\"," + String(active_num+1) + "," + String(card_num_par_page) + ")";
+                    nextLink.textContent = "次へ";
+                    next.appendChild(nextLink);
+                    ul.appendChild(next);
+                }
 
-        for(let i = 1;i<=10-page_nation_count_until_active;i++) {
-          if(active_num+i<=max_num){
-            // ページ番号1を作成
-            const page1 = document.createElement("li");
-            page1.classList.add("page-item");
-            const page1Link = document.createElement("a");
-            page1Link.classList.add("page-link");
-            page1Link.href = "javascript:updatePage(" + String(active_num+i) + ")";
-            page1Link.textContent = String(active_num+i);
-            page1.appendChild(page1Link);
-            ul.appendChild(page1);
-          }
-        }  
-      
-        if(active_num != max_num)
-        {  // 次へリンクを作成
-          const next = document.createElement("li");
-          next.classList.add("page-item");
-          const nextLink = document.createElement("a");
-          nextLink.classList.add("page-link");
-          nextLink.href = "javascript:updatePage(" + String(active_num+1) + ")";
-          nextLink.textContent = "次へ";
-          next.appendChild(nextLink);
-          ul.appendChild(next);
-        }
+                // ul要素を返す
+                return ul;
+            }
 
-        // ul要素を返す
-        return ul;
-    }
-            window.onload = function() {
+            function myfunc(category, page_num, card_num_par_page)
+            {
                 $.ajax({
                 type: 'POST',
                 url: '/getData/',
                 data: {
-                    'category': 'ミュージック',
+                    'from'    : "index",
+                    'category': category,
+                    'first': (page_num-1)*card_num_par_page,
+                    'end'  : page_num*card_num_par_page,
                 },
-                success: function(response) {
+
+                success: function(response) 
+                {
+                    category_state = category;
+                    //console.log(response.total);
+                    max_num = response.total;
+                    updatePage(page_num,card_num_par_page);
+
                     clearDiv(document.getElementById('card_holder'));
-                    for (let i = 0; i< response.total; i++) {
+                    for (let i = 0; i< response.card_num; i++) 
+                    {
                         var id = response.tournament[i].id;
-                        var url = "/preview/movies/" + id;
-                        document.getElementById('card_holder').appendChild(createCard(response.tournament[i].name, response.tournament[i].comment, url));
+                        var url = "";
+                        if(response.tournament[i].category == 'music')
+                            url = "/preview/movies/" + id;
+                            document.getElementById('card_holder').appendChild(createCard(response.tournament[i].name, response.tournament[i].comment, url, response.tournament[i].category, response.tournament[i].num));
                     }
                 },
                 error: function(response) {
                     console.log('エラーが発生しました');
                 }
                 });
+            }
 
-                $.ajax({
-                type: 'POST',
-                url: '/getData/',
-                data: {
-                    'category': '漫画',
-                },
-                success: function(response) {
-                    for (let i = 0; i< response.total; i++) {
-                        var id = response.tournament[i].id;
-                        var url = "/preview/movies/" + id;
-                        document.getElementById('card_holder').appendChild(createCard(response.tournament[i].name, response.tournament[i].comment, url));
-                    }
-                },
-                error: function(response) {
-                    console.log('エラーが発生しました');
-                }
-                });
-
-                $.ajax({
-                type: 'POST',
-                url: '/getData/',
-                data: {
-                    'category': 'バラエティ',
-                },
-                success: function(response) {
-                    for (let i = 0; i< response.total; i++) {
-                        var id = response.tournament[i].id;
-                        var url = "/preview/movies/" + id;
-                        document.getElementById('card_holder').appendChild(createCard(response.tournament[i].name, response.tournament[i].comment, url));
-                    }
-                },
-                error: function(response) {
-                    console.log('エラーが発生しました');
-                }
-                });
+            window.onload = function() 
+            {
+                myfunc("all",1,card_num_par_page);
             };
-            function createCard(titleText, bodyText, btnHref) {
+
+            function createCard(titleText, bodyText, btnHref, category, num) 
+            {
                 // col-md-4 mb-5要素を作成
                 var colDiv = document.createElement("div");
-                colDiv.className = "col-md-4 mb-5";
+                colDiv.className = "col-md-4 mb-5 mt-4";
 
                 // card要素を作成
                 var cardDiv = document.createElement("div");
                 cardDiv.className = "card h-100";
+                
+                var cardHeader = document.createElement("p");
+                cardHeader.className = "card-header"
+                cardHeader.innerText = category + " " + "全" + num + "選手";
 
                 // card-body要素を作成
                 var cardBodyDiv = document.createElement("div");
@@ -256,6 +248,7 @@
                 cardDiv.appendChild(cardBodyDiv);
                 cardFooterDiv.appendChild(btn);
                 cardDiv.appendChild(cardFooterDiv);
+                colDiv.appendChild(cardHeader);
                 colDiv.appendChild(cardDiv);
 
                 // 生成された要素を返す
@@ -298,14 +291,22 @@
                 type: 'POST',
                 url: '/getData/',
                 data: {
+                    'from'    : "index",
                     'category': category_name,
+                    'first': 0,
+                    'end'  : card_num_par_page,
                 },
                 success: function(response) {
+                    category_state = category_name;
                     clearDiv(document.getElementById('card_holder'));
-                    for (let i = 0; i< response.total; i++) {
-                        var id = parseInt(response.tournament[i].id);
-                        var url = "/preview/movies/" + id;
-                        document.getElementById('card_holder').appendChild(createCard(response.tournament[i].name, response.tournament[i].comment, url));
+                    max_num = response.total;
+                    updatePage(1,card_num_par_page);
+                    for (let i = 0; i< response.card_num; i++) {
+                        var id = response.tournament[i].id;
+                        var url = "";
+                        if(response.tournament[i].category == 'music')
+                            url = "/preview/movies/" + id;
+                        document.getElementById('card_holder').appendChild(createCard(response.tournament[i].name, response.tournament[i].comment, url, response.tournament[i].category, response.tournament[i].num));
                     }
                 },
                 error: function(response) {

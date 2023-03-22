@@ -2,11 +2,18 @@
 <!doctype html>
 <html lang="ja" >
   <head>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="Twitter:site" content="@oreha_majikami">
+    <meta name="twitter:title" id="twitter_title" content="">
+    <meta name="twitter:description" id="twitter_description" content="">
+    <meta name="twitter:image" id="twitter_image" content="">
+
     <title>Album example for Bootstrap ﾂｷ Bootstrap</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   </head>
   <body >
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="mainNav">
     <div class="container px-4">
@@ -14,9 +21,6 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
             </ul>
         </div>
     </div>
@@ -32,13 +36,14 @@
   </div>
   <div class="section1 text-center">
     <div class="button align-items-start">
-      <a href="" class="btn btn-primary col-6 mt-3 mb-3 py-4 btn-lg" type="button" id="play_button">遊ぶ</a>
+      <a href="" class="d-none btn btn-primary col-6 mt-3 mb-3 py-4 btn-lg" type="button" id="play_button">遊ぶ</a>
+      <button type="button" class="btn btn-primary col-6 mt-3 mb-3 py-4 btn-lg" id="button1123" data-toggle="modal" data-target="#playMordal">遊ぶ</button>
     </div>
   </div>
   <div class="container">
     <div class="row">
       <div class="col-md-12 text-center">
-        <h2 class="text-uppercase display-4 mt-1" style="font-family: 'Roboto', sans-serif;">出場者一覧</h2>
+        <h2 class="text-uppercase display-4 mt-1" id="participants" style="font-family: 'Roboto', sans-serif;"></h2>
       </div>
     </div>
   </div>
@@ -85,12 +90,43 @@
                     <label>結果をシェアする</label>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-                    <button type="button" class="btn btn-danger">Twitter</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">閉じる</button>
+                    <button id="twitter_share" type="button" onclick="window.open('https://twitter.com/share?url=http://127.0.0.1:8000/detail/1/&text=L4D2をやりました ホームページ名')" class="btn btn-primary">Twitter</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade show" id="playMordal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+        
+      <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <p class="text-uppercase display-5 mt-1" style="font-family: 'Roboto', sans-serif;" id="mordal_title"></p>
+                </div>
+              </div>
+            </div>
+            <div id="mini_card_holder">
+              
+            </div>
+              <div class="modal-body">
+                <div class="dropdown text-center">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    14選手出場させる
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="selection_num">
+                    
+                  </ul>
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-dismiss="modal" id="start_button">トーナメント開始</button>
+              </div>
+          </div>
+      </div>
+  </div>
     
  
     <!-- Optional JavaScript -->
@@ -112,7 +148,46 @@
         var tournament_name = "{{tournament_name}}";
         var max_num =  link_list.length;
 
+    var state_num = link_list.length;
+    document.getElementById("dropdownMenuButton1").innerHTML = state_num + "選手出場させる";
 
+    function generateDropdownItem(condition) 
+    {
+      const dropdownItem = document.createElement("li");
+      const dropdownLink = document.createElement("a");
+      
+      dropdownLink.classList.add("dropdown-item");
+      dropdownLink.textContent = condition;
+      dropdownLink.addEventListener("click", function() {
+        var url_next2 = '/ranking/movies/' + tournament_pk + '/' + condition;
+        changeCondition(condition);
+        document.getElementById("start_button").setAttribute("onclick" , "location.href=\'" + url_next2 + "\'");
+      });
+      
+      dropdownItem.appendChild(dropdownLink);
+      
+      return dropdownItem;
+    }
+
+    function changeCondition(condition)
+    {
+      document.getElementById("dropdownMenuButton1").innerHTML = condition + "選手出場させる";
+      state_num = condition;
+    }
+    var power_2_count = 2;
+    while(power_2_count < max_num)
+    {
+      document.getElementById("selection_num").appendChild(generateDropdownItem(power_2_count));
+      power_2_count *= 2;
+    }
+
+    document.getElementById("selection_num").appendChild(generateDropdownItem(max_num));
+    
+    //document.getElementById("selection_num").innerHTML = tournament_name;
+    document.getElementById("mordal_title").innerHTML = tournament_name;
+    var url_next = '/ranking/movies/' + tournament_pk + '/' + state_num;
+    document.getElementById("start_button").setAttribute("onclick" , "location.href=\'" + url_next + "\'");
+    document.getElementById("participants").innerHTML = "出場者一覧: " + "全" + link_list.length + "選手";
     {% if winner_id %}
       var winner_id = {{winner_id}}-1;
     {% else %}
@@ -203,11 +278,11 @@
     updatePage(1);
     function updatePage(active_num)
     {
-        if(Math.floor(max_num/6+1) != 1)
+        if(Math.floor(max_num/contentsNum_parPage+1) != 1)
         {
           document.getElementById('page').innerHTML = '';
-          console.log(max_num);
-          document.getElementById('page').appendChild(createPagination(Math.floor(max_num/6+1), active_num));
+          //console.log(max_num);
+          document.getElementById('page').appendChild(createPagination(Math.floor(max_num/contentsNum_parPage+1), active_num));
         }
 
         document.getElementById('card_holder').innerHTML = '';
@@ -243,16 +318,21 @@
         }
 
         if(winner_id >-1)
-        { console.log(history);
+        { 
+          //console.log(history);
           var currentUrl = window.location.href;
           var index = currentUrl.lastIndexOf("/");
           var newUrl = currentUrl.substring(0, index+1);
           window.history.replaceState({}, document.title, newUrl);
           if(winner_id <= link_list.length-1)
           {
-              console.log(winner_id);
+              //console.log(winner_id);
+              document.getElementById("twitter_image").setAttribute("content", "http://img.youtube.com/vi/" + link_list[winner_id] + "/default.jpg");
+              document.getElementById("twitter_title").setAttribute("content", tournament_name);
+              document.getElementById("twitter_description").setAttribute("content", "トーナメント形式で1番良いものを決めれる場所 色々トーナメント");
               document.getElementById("mini_card_holder").innerHTML = createminiCard(title_list[winner_id], link_list[winner_id], thumbnail_list[winner_id], 12);
               document.getElementById("button_1").click();
+              document.getElementById("twitter_share").setAttribute("onclick" , "window.open(\'" + "https://twitter.com/share?url=" + window.location.href + (winner_id) + "&text=" + "この曲が一番良い!&hashtags=色々トーナメント" + "\') ");
 
           }
         }

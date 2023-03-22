@@ -105,10 +105,8 @@
       for (i=0; i < link_list.length; i++) {
         id_list.push(i);
       }
-
-      id_list.splice(team_num,link_list.length);
       
-      shuffle(id_list);
+    
       //team_num = link_list.length;
       power_2 = 1;
       power_2_count = 0;
@@ -127,8 +125,7 @@
       right_id = 1;
       tree_pos  = power_2_count;
 
-      document.getElementById("title1").innerHTML = title_list[id_list[left_id]];
-      document.getElementById("title2").innerHTML = title_list[id_list[right_id]];
+      document.getElementById("title1").innerHTML = left_id;
       videoId1 = link_list[id_list[left_id]];
       videoId2 = link_list[id_list[right_id]];
 
@@ -157,37 +154,12 @@
             'onError': onPlayerError
           }
         });
-        player2 = new YT.Player('player2', {
-          height: '500',
-          width: '640',
-          host: `http://www.youtube.com`,
-          videoId: videoId2,
-          playerVars: {
-            'autoplay': 1, // 自動再生しない
-            'controls': 1, // コントロールバーを表示する
-            'disablekb': 0, // キーボード操作を有効にする
-            'rel': 0, // 関連動画を表示しない
-            'showinfo': 1,
-            "origin": "http://www.youtube.com"
-          },
-          events: {
-            'onReady': onPlayerReady,
-            'onError': onPlayerError
-          }
-        });
+        
       }
+      list_error = []
       function onPlayerError(event) {
+        list_error.push(left_id);
         
-        var code = event.data;
-        
-        var errors = {
-            '2' : 'リクエストに無効なパラメータ値が含まれています。たとえば、11 文字ではない動画 ID を指定した場合や、動画 ID に無効な文字列（感嘆符やアスタリスクなど）が使われている場合にこのエラーが発生します。',
-            '5' : 'リクエストしたコンテンツは HTML5 プレーヤーで再生できない、または HTML5 プレーヤーに関する別のエラーが発生しました。',
-            '100' : 'リクエストした動画が見つかりません。これは、動画が何らかの理由で削除されている場合や、非公開に設定されている場合に発生します。',
-            '101' : 'リクエストした動画の所有者が、埋め込み動画プレーヤーでの再生を許可していません。',
-            '150' : 'このエラーは 101 と同じです。番号は異なりますが、101 のエラーと内容は同じです。'
-        };
-        console.log(code);
   }
 
       function getCookie(name) {
@@ -214,162 +186,36 @@
 
       var tournament_pk = {{ tournament_pk|safe }};
 
-      function poll1() {
-        //console.log(link_list[id_list[left_id]]);
-        //console.log(link_list[id_list[right_id]]);
-        result_list[tree_pos].push(new video_info(id_list[right_id],id_list[left_id]));
-        id_list.splice(right_id,1);
+      function poll1() 
+      {
         left_id++;
-        right_id++;
-        if(id_list.length == 1)
+        if(left_id == id_list.length+1)
         {
-          tree_pos--;
-          result_list[tree_pos].push(new video_info(id_list[0],'none'));
-          window.location.href = "/preview/movies/"+ tournament_pk + "/" + id_list[0];
-          return;
+            window.location.href = window.location.href;
+            console.log(list_error);
+            return;
         }
 
-        if(present_match_num == match_num_at_best)
+        if(left_id == id_list.length)
         {
-          tree_pos--;
-          present_match_num = 1;
-          best_num = 2**tree_pos;
-          match_num_at_best = best_num/2;
-          left_id = 0;
-          right_id = 1;
-        }else{
-          present_match_num++;
+            console.log(list_error);
+            return;
         }
-
-        if(best_num == 2)
-        {
-          progress_element.innerHTML = "決勝戦";
-        }else{
-          progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
-        }
-
 
         player1.mute();
-        player2.mute();
         var count = 1;
-
+    
         videoId1 = link_list[id_list[left_id]];
-        videoId2 = link_list[id_list[right_id]];
+        
 
         player1.loadVideoById(videoId1);
-        player2.loadVideoById(videoId2);
         // setIntervalを使用して、0.5秒ごとに処理を実行する
-        const intervalId = setInterval(() => {
-            if(player1.getDuration()>1 && player2.getDuration()>1) {
-              player1.seekTo(player1.getDuration()*0.3, true);
-              player2.seekTo(player2.getDuration()*0.3, true);
-              player1.mute();
-              player2.mute();
-              clearInterval(intervalId); // setIntervalを停止する
-            }
-
-          if (count >= 6) { // カウンター変数が6になったら、3秒間の処理が完了したことを示す
-            clearInterval(intervalId); // setIntervalを停止する
-          }
-        }, 500); // 0.5秒ごとに処理を実行するように指定する
-
-        document.getElementById("title1").innerHTML = title_list[id_list[left_id]];
-        document.getElementById("title2").innerHTML = title_list[id_list[right_id]];
         
-        /*
-        var list1 = [1,2,3,4,5];
-        $.ajax({
-          type: 'POST',
-          url: '/sendData/',
-          data: { 
-            'mylist' : JSON.stringify(list1),
-            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-          },
-          success: function(response) {
-            console.log('成功しました');
-          },
-          error: function(response) {
-            console.log('エラーが発生しました');
-          }
-        });
-      */
 
+        document.getElementById("title1").innerHTML = left_id;                
       }
 
       function poll2() {
-        result_list[tree_pos].push(new video_info(id_list[left_id],id_list[right_id]));
-        id_list.splice(left_id,1);
-        left_id++;
-        right_id++;
-        if(id_list.length == 1)
-        {
-          tree_pos--;
-          result_list[tree_pos].push(new video_info(id_list[0],'none'));
-          window.location.href = "/preview/movies/"+ tournament_pk + "/" + id_list[0];
-          return;
-        }
-
-        if(present_match_num == match_num_at_best)
-        {
-          tree_pos--;
-          present_match_num = 1;
-          best_num = 2**tree_pos;
-          match_num_at_best = best_num/2;
-          left_id = 0;
-          right_id = 1;
-        }else{
-          present_match_num++;
-
-        }
-        if(best_num == 2)
-        {
-          progress_element.innerHTML = "決勝戦";
-        }else{
-          progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
-        }
-        videoId1 = link_list[id_list[left_id]];
-        videoId2 = link_list[id_list[right_id]];
-
-        player1.mute();
-        player2.mute();
-        var count = 1;
-        player1.loadVideoById(videoId1);
-        player2.loadVideoById(videoId2);
-        // setIntervalを使用して、0.5秒ごとに処理を実行する
-        const intervalId = setInterval(() => {
-            if(player1.getDuration()>1 && player2.getDuration()>1) {
-              player1.seekTo(player1.getDuration()*0.3, true);
-              player2.seekTo(player2.getDuration()*0.3, true);
-              player1.mute();
-              player2.mute();
-              clearInterval(intervalId); // setIntervalを停止する
-            }
-
-          if (count >= 6) { // カウンター変数が6になったら、3秒間の処理が完了したことを示す
-            clearInterval(intervalId); // setIntervalを停止する
-          }
-        }, 500); // 0.5秒ごとに処理を実行するように指定する
-
-        document.getElementById("title1").innerHTML = title_list[id_list[left_id]];
-        document.getElementById("title2").innerHTML = title_list[id_list[right_id]];
-
-        /*
-        var list1 = [1,2,3,4,5];
-        $.ajax({
-          type: 'POST',
-          url: '/sendData/',
-          data: { 
-            'mylist' : JSON.stringify(list1),
-            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-          },
-          success: function(response) {
-            console.log('成功しました');
-          },
-          error: function(response) {
-            console.log('エラーが発生しました');
-          }
-        });
-        */
       }
 
       function onPlayerReady(event) {

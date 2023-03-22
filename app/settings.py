@@ -37,11 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'ranking.apps.RankingConfig' ,
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -130,10 +128,3 @@ STATIC_ROOT = '/static'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# 許可するオリジン
-CORS_ORIGIN_WHITELIST = [
-    "*"
-]
-# レスポンスを公開する
-CORS_ALLOW_CREDENTIALS = True
