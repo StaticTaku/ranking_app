@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>YouTube IFrame API Example</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         .btn-lg {
@@ -17,6 +16,8 @@
         crossorigin="anonymous"></script>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>色々トーナメント</title>
+      <link rel="icon" type="image/x-icon" href="{% static 'images/vs.jpg' %}" />
   </head>
 <body>
         
@@ -27,6 +28,8 @@
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarResponsive">
               <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="https://github.com/StaticTaku" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                <li class="nav-item"><a class="nav-link" href="https://twitter.com/oreha_majikami" target="_blank" rel="noopener noreferrer">Twitter</a></li>
               </ul>
           </div>
       </div>
@@ -51,7 +54,7 @@
                 <button onclick="listen1()" class="btn btn-primary col-12 mt-3 py-4 btn-lg" type="button">こっちを聴く</button>
                 <button onclick="poll1()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
             </div>
-            <div class="col-sm-12 col-md-12 col-xs-12 col-lg-2 d-flex align-items-center"> <img src="{% static 'admin/img/vs.jpg' %}" width="300" height="300" class="img-fluid mx-auto d-block" alt="Responsive image"> </div>
+            <div class="col-sm-12 col-md-12 col-xs-12 col-lg-2 d-flex align-items-center"> <img src="{% static 'images/vs.jpg' %}" width="300" height="300" class="img-fluid mx-auto d-block" alt="Responsive image"> </div>
             <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
                 <div class="col-md-12 text-center">
                   <p class="lead display-6 text-wrap text-break" style="font-family: 'Roboto', sans-serif;" id="title2"></p>
@@ -136,7 +139,12 @@
       match_num_at_best = 2**tree_pos/2 - sheed_num;
       present_match_num = 1;
 
-      progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
+      if(team_num == 2)
+      {
+        progress_element.innerHTML = "決勝戦";  
+      }else{
+        progress_element.innerHTML = "ベスト" + best_num + " - " + present_match_num + "/" + match_num_at_best + "試合目";
+      }
 
       function onYouTubeIframeAPIReady() {
         player1 = new YT.Player('player1', {
