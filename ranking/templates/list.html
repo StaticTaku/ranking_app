@@ -3,10 +3,9 @@
 <html lang="ja" >
   <head>
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="Twitter:site" content="@oreha_majikami">
-    <meta name="twitter:title" id="twitter_title" content="">
-    <meta name="twitter:description" id="twitter_description" content="">
-    <meta name="twitter:image" id="twitter_image" content="">
+    <meta name="twitter:title" id="twitter_title" content="色々トーナメント">
+    <meta name="twitter:description" id="twitter_description" content="トーナメント形式で1番良いものを決めれるサイト">
+    <meta name="twitter:image" id="twitter_image" content="{% static 'images/vs.jpg' %}">
 
     <title>色々トーナメント</title>
       <link rel="icon" type="image/x-icon" href="{% static 'images/vs.jpg' %}" />
@@ -94,7 +93,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">閉じる</button>
-                    <button id="twitter_share" type="button" onclick="window.open('https://twitter.com/intent/tweet?url=http://127.0.0.1:8000/detail/1/&text=L4D2をやりました ホームページ名')" class="btn btn-primary">Twitter</button>
+                    <button id="twitter_share" type="button" class="btn btn-primary">Twitter</button>
+                    <button id="LINE_share" type="button" class="btn btn-success">LINE</button>
+                    
                 </div>
             </div>
         </div>
@@ -322,6 +323,20 @@
 
         if(winner_id >-1)
         { 
+          const url_site = window.location.href;
+          
+          const shareURL = (text) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(text)}`;
+          const TEXT = `トーナメント優勝は「` + title_list[winner_id] + `」！！
+          ` + url_site.replace(/^https?:\/\//i, '')  + `
+          #色々トーナメント
+          `;
+
+
+          const shareURL_LINE = (text) => `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+          const TEXT_LINE = `トーナメント優勝は「` + title_list[winner_id] + `」！！
+          ` + url_site.replace(/^https?:\/\//i, '')  + `
+          `;
+
           //console.log(history);
           var currentUrl = window.location.href;
           var index = currentUrl.lastIndexOf("/");
@@ -330,12 +345,15 @@
           if(winner_id <= link_list.length-1)
           {
               //console.log(winner_id);
-              document.getElementById("twitter_image").setAttribute("content", "http://img.youtube.com/vi/" + link_list[winner_id] + "/default.jpg");
-              document.getElementById("twitter_title").setAttribute("content", tournament_name);
-              document.getElementById("twitter_description").setAttribute("content", "トーナメント形式で1番良いものを決めれる場所 色々トーナメント");
               document.getElementById("mini_card_holder").innerHTML = createminiCard(title_list[winner_id], link_list[winner_id], thumbnail_list[winner_id], 12);
               document.getElementById("button_1").click();
-              document.getElementById("twitter_share").setAttribute("onclick" , "window.open(\'" + "https://twitter.com/intent/tweet?url=" + window.location.href + (winner_id) + "&text=" + "この曲が一番良い!&hashtags=色々トーナメント" + "\') ");
+              twitter_share.addEventListener("click", ()=> {
+                window.open(shareURL(TEXT), "_blank", "noreferrer");
+              });
+
+              LINE_share.addEventListener("click", ()=> {
+                window.open(shareURL_LINE(TEXT_LINE), "_blank", "noreferrer");
+              });
 
           }
         }

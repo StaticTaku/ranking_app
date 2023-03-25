@@ -2,6 +2,10 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter_title" content="色々トーナメント">
+    <meta name="twitter:description" id="twitter_description" content="トーナメント形式で1番良いものを決めれるサイト">
+    <meta name="twitter:image" id="twitter_image" content="{% static 'images/vs.jpg' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         .btn-lg {
@@ -46,19 +50,20 @@
 
     <div class="container-fluid">
         <div class="row">
+          <div class="col-md-5">
+            <p class="lead display-6 text-center text-break" style="font-family: 'Roboto', sans-serif;" id="title1"></p>
+          </div>
+          <div class="col-md-2"></div>
+          <div class="col-md-5 text-center">
+            <p class="lead display-6 text-wrap text-break" style="font-family: 'Roboto', sans-serif;" id="title2"></p>
+          </div>
             <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
-                <div class="col-md-12">
-                  <p class="lead display-6 text-center text-break" style="font-family: 'Roboto', sans-serif;" id="title1"></p>
-                </div>
                 <div id="player1" class="col-12"></div>
                 <button onclick="listen1()" class="btn btn-primary col-12 mt-3 py-4 btn-lg" type="button">こっちを聴く</button>
                 <button onclick="poll1()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
             </div>
             <div class="col-sm-12 col-md-12 col-xs-12 col-lg-2 d-flex align-items-center"> <img src="{% static 'images/vs.jpg' %}" width="300" height="300" class="img-fluid mx-auto d-block" alt="Responsive image"> </div>
             <div class="col-sm-12 col-md-12 col-xs-12 col-lg-5 align-items-start">
-                <div class="col-md-12 text-center">
-                  <p class="lead display-6 text-wrap text-break" style="font-family: 'Roboto', sans-serif;" id="title2"></p>
-                </div>
                 <div id="player2" class="col-12"></div>
                 <button onclick="listen2()" class="btn btn-primary col-12 mt-3 mb py-4 btn-lg" type="button">こっちを聴く</button>
                 <button onclick="poll2()" class="btn btn-primary col-12 mt-3 mb-3 py-4 btn-lg" type="button">この曲を選ぶ</button>
@@ -109,9 +114,10 @@
         id_list.push(i);
       }
 
-      id_list.splice(team_num,link_list.length);
-      
       shuffle(id_list);
+
+      id_list.splice(team_num,link_list.length);
+    
       //team_num = link_list.length;
       power_2 = 1;
       power_2_count = 0;
